@@ -1,15 +1,22 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+
+import { SiteHeaderComponent } from './main/header.component';
+import { SupriseMeComponent } from './main/supriseMe.component';
+import { SearchPanelComponent } from './main/searchPanel.component';
+
+
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [SiteHeaderComponent, SupriseMeComponent, SearchPanelComponent ],
   template: `
-    <h1>Welcome to {{title}}!</h1>
 
-    <router-outlet />
+    <app-site-header></app-site-header>
+    <app-suprise-me></app-suprise-me>
+    <app-search-panel></app-search-panel>
   `,
-  styles: [],
+
 })
 export class AppComponent {
   title = 'rickAndMortyApp';
