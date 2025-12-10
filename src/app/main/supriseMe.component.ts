@@ -35,10 +35,24 @@ import { RickAndMortyService } from "../services/rick-and-morty.service";
 })
 export class SupriseMeComponent {
   constructor(private rickAndMortyService: RickAndMortyService) {}
-  wynik = "";
+  wynik: string = "";
+  GetRandomCategory() {
+    return Math.floor(Math.random() * 3);
+  }
+
   onClick() {
-    this.rickAndMortyService.GetRandomResult().subscribe((data) => {
-      this.wynik = JSON.stringify(data);
-    });
+    if (this.GetRandomCategory() === 0) {
+      this.rickAndMortyService.GetRandomCharacter().subscribe((data: any) => {
+        this.wynik = `Postać: ${data.name}`;
+      });
+    } else if (this.GetRandomCategory() === 1) {
+      this.rickAndMortyService.GetRandomLocation().subscribe((data: any) => {
+        this.wynik = `Lokalizacja: ${data.name}`;
+      });
+    } else if (this.GetRandomCategory() === 2) {
+      this.rickAndMortyService.GetRandomEpisode().subscribe((data: any) => {
+        this.wynik = `Odcinek: ${data.name}`;
+      });
+    }
   }
 }
