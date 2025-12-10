@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { RickAndMortyService } from "../services/rick-and-morty.service";
 
 @Component({
   selector: "app-suprise-me",
@@ -6,7 +7,8 @@ import { Component } from "@angular/core";
     <div class="surprise-box">
       <h2>Zaskocz Mnie!</h2>
       <p>Kliknij, aby wylosować postać.</p>
-      <button class="button">Losuj</button>
+      <button class="button" (click)="onClick()">Losuj</button>
+      <p>{{ wynik }}</p>
     </div>
   </main>`,
   styles: [
@@ -31,4 +33,12 @@ import { Component } from "@angular/core";
     `,
   ],
 })
-export class SupriseMeComponent {}
+export class SupriseMeComponent {
+  constructor(private rickAndMortyService: RickAndMortyService) {}
+  wynik = "";
+  onClick() {
+    this.rickAndMortyService.GetRandomResult().subscribe((data) => {
+      this.wynik = JSON.stringify(data);
+    });
+  }
+}
