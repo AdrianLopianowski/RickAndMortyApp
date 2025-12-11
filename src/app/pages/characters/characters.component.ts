@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { RickAndMortyService } from "../../services/rick-and-morty.service";
 import { CommonModule } from "@angular/common";
+import { ApiResponse, Character, Info } from "../../models/rick-and-morty.interface";
 
 @Component({
   selector: "app-characters",
@@ -49,13 +50,13 @@ import { CommonModule } from "@angular/common";
 export class CharactersComponent {
   constructor(private rickAndMortyService: RickAndMortyService) {}
   currentPage: number = 1;
-  paginationInfo: any = null;
-  characters: any[] = [];
+  paginationInfo: Info | null = null;
+  characters: Character[] = [];
   ngOnInit() {
     this.LoadData();
   }
   LoadData() {
-    this.rickAndMortyService.GetAllCharacters(this.currentPage).subscribe((data: any) => {
+    this.rickAndMortyService.GetAllCharacters(this.currentPage).subscribe((data) => {
       this.characters = data.results;
       this.paginationInfo = data.info;
     });

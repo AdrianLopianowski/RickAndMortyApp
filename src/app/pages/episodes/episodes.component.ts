@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { RickAndMortyService } from "../../services/rick-and-morty.service";
 import { CommonModule } from "@angular/common";
+import { Episode, Info } from "../../models/rick-and-morty.interface";
 
 @Component({
   selector: "app-episodes",
@@ -49,13 +50,13 @@ import { CommonModule } from "@angular/common";
 export class EpisodesComponent {
   constructor(private rickAndMortyService: RickAndMortyService) {}
   currentPage: number = 1;
-  paginationInfo: any = null;
-  episodes: any[] = [];
+  paginationInfo: Info | null = null;
+  episodes: Episode[] = [];
   ngOnInit() {
     this.LoadData();
   }
   LoadData() {
-    this.rickAndMortyService.GetAllEpisodes(this.currentPage).subscribe((data: any) => {
+    this.rickAndMortyService.GetAllEpisodes(this.currentPage).subscribe((data) => {
       this.episodes = data.results;
       this.paginationInfo = data.info;
     });

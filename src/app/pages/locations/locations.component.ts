@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { RickAndMortyService } from "../../services/rick-and-morty.service"; // Sprawdź ścieżkę
+import { RickAndMortyService } from "../../services/rick-and-morty.service";
 import { CommonModule } from "@angular/common";
+import { ApiResponse, Location, Info } from "../../models/rick-and-morty.interface";
 
 @Component({
   selector: "app-locations",
@@ -59,13 +60,13 @@ import { CommonModule } from "@angular/common";
 export class LocationsComponent {
   constructor(private rickAndMortyService: RickAndMortyService) {}
   currentPage: number = 1;
-  paginationInfo: any = null;
-  locations: any[] = [];
+  paginationInfo: Info | null = null;
+  locations: Location[] = [];
   ngOnInit() {
     this.LoadData();
   }
   LoadData() {
-    this.rickAndMortyService.GetAllLocations(this.currentPage).subscribe((data: any) => {
+    this.rickAndMortyService.GetAllLocations(this.currentPage).subscribe((data) => {
       this.locations = data.results;
       this.paginationInfo = data.info;
     });

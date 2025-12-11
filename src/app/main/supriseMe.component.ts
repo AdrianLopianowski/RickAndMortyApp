@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
 import { RickAndMortyService } from "../services/rick-and-morty.service";
+import { Character, Episode, Location } from "../models/rick-and-morty.interface";
 
 @Component({
   selector: "app-suprise-me",
@@ -41,16 +42,18 @@ export class SupriseMeComponent {
   }
 
   onClick() {
-    if (this.GetRandomCategory() === 0) {
-      this.rickAndMortyService.GetRandomCharacter().subscribe((data: any) => {
+    const category = this.GetRandomCategory();
+
+    if (category === 0) {
+      this.rickAndMortyService.GetRandomCharacter().subscribe((data) => {
         this.wynik = `Postać: ${data.name}`;
       });
-    } else if (this.GetRandomCategory() === 1) {
-      this.rickAndMortyService.GetRandomLocation().subscribe((data: any) => {
+    } else if (category === 1) {
+      this.rickAndMortyService.GetRandomLocation().subscribe((data: Location) => {
         this.wynik = `Lokalizacja: ${data.name}`;
       });
-    } else if (this.GetRandomCategory() === 2) {
-      this.rickAndMortyService.GetRandomEpisode().subscribe((data: any) => {
+    } else if (category === 2) {
+      this.rickAndMortyService.GetRandomEpisode().subscribe((data: Episode) => {
         this.wynik = `Odcinek: ${data.name}`;
       });
     }
