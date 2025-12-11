@@ -21,4 +21,14 @@ export class RickAndMortyService {
     const randomNum: number = Math.floor(Math.random() * 51) + 1;
     return this.http.get(`https://rickandmortyapi.com/api/episode/${randomNum}`);
   }
+
+  GetAllCharacters(page: number = 1) {
+    return this.http.get(`https://rickandmortyapi.com/api/character?page=${page}`);
+  }
+  GetAllLocations(page: number = 1) {
+    return this.http.get(`https://rickandmortyapi.com/api/location?page=${page}`);
+  }
+  GetAllEpisodes(page: number = 1) {
+    return this.http.get(`https://rickandmortyapi.com/api/episode?page=${page}`);
+  }
 }

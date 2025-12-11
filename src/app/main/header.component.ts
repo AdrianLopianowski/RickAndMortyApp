@@ -1,16 +1,18 @@
 import { Component } from "@angular/core";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: "app-site-header",
+  imports: [RouterLink],
   template: `
     <header class="site-header">
       <div class="container header-container">
         <a routerLink="/" class="logo"> R&M </a>
 
         <nav class="main-nav">
-          <a routerLink="/postacie" class="nav-link">Postacie</a>
-          <a routerLink="/lokacje" class="nav-link">Lokacje</a>
-          <a routerLink="/odcinki" class="nav-link">Odcinki</a>
+          <button routerLink="/characters" class="nav-button">Postacie</button>
+          <button routerLink="/locations" class="nav-button">Lokacje</button>
+          <button routerLink="/episodes" class="nav-button">Odcinki</button>
         </nav>
       </div>
     </header>
@@ -25,7 +27,7 @@ import { Component } from "@angular/core";
   styles: [
     `
       .site-header {
-        background-color: #1f2937; /* ciemne tło */
+        background-color: #1f2937;
         border-bottom: 1px solid #374151;
         padding: 8px 0;
         position: sticky;
@@ -58,23 +60,16 @@ import { Component } from "@angular/core";
         display: flex;
         gap: 1.5rem;
       }
-      .main-nav a {
+      .nav-button {
+        background-color: transparent;
         color: #f9fafb;
-        text-decoration: none;
-        margin-left: 24px;
+        border: none;
         font-weight: 700;
-      }
-
-      .main-nav a:first-child {
-        margin-left: 0;
-      }
-      .nav-link {
-        color: #e5e7eb;
-        text-decoration: none;
+        cursor: pointer;
         transition: color 0.15s ease-in-out;
       }
 
-      .nav-link:hover {
+      .nav-button:hover {
         color: #ffffff;
       }
 
