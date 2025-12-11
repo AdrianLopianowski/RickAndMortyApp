@@ -33,7 +33,7 @@ export interface Episode {
   id: number;
   name: string;
   air_date: string;
-  episode: string; //
+  episode: string;
   characters: string[]; // Tablica linków do postaci
   url: string;
   created: string;

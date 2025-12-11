@@ -6,7 +6,7 @@ import { Character, Episode, Location } from "../models/rick-and-morty.interface
   selector: "app-suprise-me",
   template: ` <main class="container">
     <div class="surprise-box">
-      <h2>Zaskocz Mnie!</h2>
+      <h2 class="subtitle">Zaskocz Mnie!</h2>
       <p>Kliknij, aby wylosować postać.</p>
       <button class="button" (click)="onClick()">Losuj</button>
       <p>{{ wynik }}</p>
@@ -22,14 +22,31 @@ import { Character, Episode, Location } from "../models/rick-and-morty.interface
         margin-bottom: 32px;
       }
       .button {
-        background-color: #06b6d4;
-        color: white;
-        font-weight: 700;
-        padding: 8px 24px;
-        border-radius: 8px;
-        border: none;
+        font-family: "Creepster", cursive;
+        text-decoration: none;
+        text-transform: uppercase;
         cursor: pointer;
-        margin-top: 16px;
+        transition: all 0.2s ease-in-out;
+        letter-spacing: 2px;
+        font-size: 1.5rem;
+        color: #97ce4c;
+        text-shadow: 2px 2px 0px #06b6d4;
+        background: none;
+        border: none;
+      }
+      .button:hover {
+        color: #ffffff;
+        text-shadow: 0 0 15px #97ce4c;
+        transform: scale(1.1);
+      }
+      .subtitle {
+        font-family: "Creepster", cursive;
+        font-size: 2rem;
+        color: #97ce4c;
+        text-shadow: 2px 2px 0px #06b6d4;
+        letter-spacing: 2px;
+        background: none;
+        border: none;
       }
     `,
   ],
@@ -45,7 +62,7 @@ export class SupriseMeComponent {
     const category = this.GetRandomCategory();
 
     if (category === 0) {
-      this.rickAndMortyService.GetRandomCharacter().subscribe((data) => {
+      this.rickAndMortyService.GetRandomCharacter().subscribe((data: Character) => {
         this.wynik = `Postać: ${data.name}`;
       });
     } else if (category === 1) {
