@@ -1,27 +1,32 @@
+import { AsyncPipe, CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
-import { RouterLink, RouterLinkActive } from "@angular/router";
+import { RouterLink, RouterLinkActive, Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Component({
   selector: "app-site-header",
-  standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, CommonModule, AsyncPipe],
   template: `
     <header class="site-header">
       <div class="container header-container">
         <a routerLink="/" class="logo"> R&M </a>
 
         <nav class="main-nav">
-          <a routerLink="/characters" routerLinkActive="active" class="nav-link">
-            Postacie
-          </a>
+          <a routerLink="/characters" routerLinkActive="active" class="nav-link"
+            >Postacie</a
+          >
+          <a routerLink="/locations" routerLinkActive="active" class="nav-link"
+            >Lokacje</a
+          >
+          <a routerLink="/episodes" routerLinkActive="active" class="nav-link">Odcinki</a>
 
-          <a routerLink="/locations" routerLinkActive="active" class="nav-link">
-            Lokacje
+          @if (authService.isLoggenIn$ | async) {
+          <button (click)="onLogout()" class="nav-link logout-btn">Wyloguj</button>
+          } @else {
+          <a routerLink="/login" routerLinkActive="active" class="nav-link login-link">
+            Login
           </a>
-
-          <a routerLink="/episodes" routerLinkActive="active" class="nav-link">
-            Odcinki
-          </a>
+          }
         </nav>
       </div>
     </header>
@@ -139,7 +144,17 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
           font-size: 1.2rem;
         }
       }
+      .login {
+        position: right;
+      }
     `,
   ],
 })
-export class SiteHeaderComponent {}
+export class SiteHeaderComponent {
+  constructor(public authService: AuthService, private router: Router) {}
+
+  onLogout() {
+    this.authService.logout();
+    this.router.navigate(["/"]);
+  }
+}
