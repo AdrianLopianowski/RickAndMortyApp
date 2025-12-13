@@ -1,17 +1,31 @@
 import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+
 import { RickAndMortyService } from "../services/rick-and-morty.service";
 import { Character, Episode, Location } from "../models/rick-and-morty.interface";
 
+import { CardComponent } from "../shared/components/cardComponent";
+
 @Component({
   selector: "app-suprise-me",
-  template: ` <main class="container">
-    <div class="surprise-box">
-      <h2 class="subtitle">Zaskocz Mnie!</h2>
-      <p>Kliknij, aby wylosować postać.</p>
-      <button class="button" (click)="onClick()">Losuj</button>
-      <p>{{ wynik }}</p>
-    </div>
-  </main>`,
+  standalone: true,
+  imports: [CommonModule, CardComponent],
+  template: `
+    <main class="container">
+      <div class="surprise-box">
+        <h2 class="subtitle">Zaskocz Mnie!</h2>
+        <p>Kliknij, aby wylosować losowy element z uniwersum.</p>
+
+        <button class="button" (click)="onClick()">Losuj</button>
+
+        <div class="result-container">
+          @if (wylosowanyObiekt) {
+          <app-card [data]="wylosowanyObiekt"></app-card>
+          }
+        </div>
+      </div>
+    </main>
+  `,
   styles: [
     `
       .surprise-box {
@@ -20,10 +34,20 @@ import { Character, Episode, Location } from "../models/rick-and-morty.interface
         border-radius: 8px;
         padding: 24px;
         margin-bottom: 32px;
+        text-align: center;
+      }
+      .result-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      app-card {
+        max-width: 320px;
+        width: 100%;
+        display: block;
       }
       .button {
         font-family: "Creepster", cursive;
-        text-decoration: none;
         text-transform: uppercase;
         cursor: pointer;
         transition: all 0.2s ease-in-out;
@@ -32,12 +56,15 @@ import { Character, Episode, Location } from "../models/rick-and-morty.interface
         color: #97ce4c;
         text-shadow: 2px 2px 0px #06b6d4;
         background: none;
-        border: none;
+        border: 2px solid #97ce4c;
+        border-radius: 8px;
+        padding: 10px 20px;
       }
       .button:hover {
-        color: #ffffff;
-        text-shadow: 0 0 15px #97ce4c;
-        transform: scale(1.1);
+        background-color: #97ce4c;
+        color: #1f2937;
+        text-shadow: none;
+        transform: scale(1.05);
       }
       .subtitle {
         font-family: "Creepster", cursive;
@@ -45,15 +72,20 @@ import { Character, Episode, Location } from "../models/rick-and-morty.interface
         color: #97ce4c;
         text-shadow: 2px 2px 0px #06b6d4;
         letter-spacing: 2px;
-        background: none;
-        border: none;
+        margin-bottom: 10px;
+      }
+      p {
+        color: #d1d5db;
+        margin-bottom: 20px;
       }
     `,
   ],
 })
 export class SupriseMeComponent {
+  wylosowanyObiekt: any = null;
+
   constructor(private rickAndMortyService: RickAndMortyService) {}
-  wynik: string = "";
+
   GetRandomCategory() {
     return Math.floor(Math.random() * 3);
   }
@@ -62,16 +94,16 @@ export class SupriseMeComponent {
     const category = this.GetRandomCategory();
 
     if (category === 0) {
-      this.rickAndMortyService.GetRandomCharacter().subscribe((data: Character) => {
-        this.wynik = `Postać: ${data.name}`;
+      this.rickAndMortyService.GetRandomCharacter().subscribe((data) => {
+        this.wylosowanyObiekt = data;
       });
     } else if (category === 1) {
-      this.rickAndMortyService.GetRandomLocation().subscribe((data: Location) => {
-        this.wynik = `Lokalizacja: ${data.name}`;
+      this.rickAndMortyService.GetRandomLocation().subscribe((data) => {
+        this.wylosowanyObiekt = data;
       });
     } else if (category === 2) {
-      this.rickAndMortyService.GetRandomEpisode().subscribe((data: Episode) => {
-        this.wynik = `Odcinek: ${data.name}`;
+      this.rickAndMortyService.GetRandomEpisode().subscribe((data) => {
+        this.wylosowanyObiekt = data;
       });
     }
   }
