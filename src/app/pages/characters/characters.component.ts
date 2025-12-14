@@ -2,27 +2,20 @@ import { Component, OnInit } from "@angular/core";
 import { RickAndMortyService } from "../../services/rick-and-morty.service";
 import { CommonModule } from "@angular/common";
 import { ApiResponse, Character, Info } from "../../models/rick-and-morty.interface";
+import { CardComponent } from "../../shared/components/cardComponent";
 
 @Component({
   selector: "app-characters",
-  imports: [CommonModule],
+  imports: [CommonModule, CardComponent],
   template: `
-    <div class="container">
-      <h2>Lista Postaci</h2>
-      <div class="pagination-controls">
-        <button (click)="PreviousPage()" [disabled]="currentPage === 1">
-          Poprzednia
-        </button>
-        <span>Strona {{ currentPage }}</span>
-        <button (click)="NextPage()" [disabled]="!paginationInfo?.next">Następna</button>
-      </div>
-      <ul>
+    <div class="container page-container">
+      <h2 class="page-title">Postacie</h2>
+
+      <div class="cards-grid">
         @for (character of characters; track character.id) {
-        <li>
-          {{ character.name }}
-        </li>
+        <app-card [data]="character"></app-card>
         }
-      </ul>
+      </div>
     </div>
   `,
   styles: `
@@ -45,6 +38,29 @@ import { ApiResponse, Character, Info } from "../../models/rick-and-morty.interf
         gap: 16px;
         margin-top: 20px;
       }
+      .page-container {
+      padding: 20px;
+    }
+
+    .page-title {
+      font-family: "Creepster", cursive;
+      color: #97ce4c;
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 3px 3px 0 #06b6d4;
+    }
+
+    
+    .cards-grid {
+      display: grid;
+      /* repeat(auto-fill, ...): Wstaw tyle kolumn, ile się zmieści.
+         minmax(300px, 1fr): Każda karta ma min. 300px szerokości, 
+         ale może się rozciągnąć (1fr), żeby wypełnić dziury.
+      */
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px; 
+    }
   `,
 })
 export class CharactersComponent {
