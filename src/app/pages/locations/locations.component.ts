@@ -2,28 +2,21 @@ import { Component, OnInit } from "@angular/core";
 import { RickAndMortyService } from "../../services/rick-and-morty.service";
 import { CommonModule } from "@angular/common";
 import { ApiResponse, Location, Info } from "../../models/rick-and-morty.interface";
+import { CardComponent } from "../../shared/components/cardComponent";
 
 @Component({
   selector: "app-locations",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CardComponent],
   template: `
-    <div class="container">
-      <h2>Lista Lokacji</h2>
+    <div class="container page-container">
+      <h2 class="page-title">Postacie</h2>
 
-      <div class="pagination-controls">
-        <button (click)="PreviousPage()" [disabled]="currentPage === 1">
-          Poprzednia
-        </button>
-        <span>Strona {{ currentPage }}</span>
-        <button (click)="NextPage()" [disabled]="!paginationInfo?.next">Następna</button>
-      </div>
-
-      <ul>
+      <div class="cards-grid">
         @for (location of locations; track location.id) {
-        <li>{{ location.name }} ({{ location.type }})</li>
+        <app-card [data]="location"></app-card>
         }
-      </ul>
+      </div>
     </div>
   `,
 
@@ -53,6 +46,23 @@ import { ApiResponse, Location, Info } from "../../models/rick-and-morty.interfa
         align-items: center;
         gap: 16px;
         margin-top: 20px;
+      }
+      .page-container {
+        padding: 20px;
+      }
+      .page-title {
+        font-family: "Creepster", cursive;
+        color: #97ce4c;
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 3px 3px 0 #06b6d4;
+      }
+      .cards-grid {
+        display: grid;
+
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
       }
     `,
   ],

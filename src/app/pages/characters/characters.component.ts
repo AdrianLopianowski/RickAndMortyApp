@@ -54,10 +54,7 @@ import { CardComponent } from "../../shared/components/cardComponent";
     
     .cards-grid {
       display: grid;
-      /* repeat(auto-fill, ...): Wstaw tyle kolumn, ile się zmieści.
-         minmax(300px, 1fr): Każda karta ma min. 300px szerokości, 
-         ale może się rozciągnąć (1fr), żeby wypełnić dziury.
-      */
+  
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 24px; 
     }
