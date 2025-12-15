@@ -17,6 +17,15 @@ import { CardComponent } from "../../shared/components/cardComponent";
         <app-card [data]="location"></app-card>
         }
       </div>
+      <div class="pagination-controls">
+        <button (click)="PreviousPage()" [disabled]="!paginationInfo?.prev">
+          Poprzednia Strona
+        </button>
+        <span>Strona {{ currentPage }}</span>
+        <button (click)="NextPage()" [disabled]="!paginationInfo?.next">
+          Następna Strona
+        </button>
+      </div>
     </div>
   `,
 

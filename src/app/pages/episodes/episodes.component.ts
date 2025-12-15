@@ -2,27 +2,28 @@ import { Component } from "@angular/core";
 import { RickAndMortyService } from "../../services/rick-and-morty.service";
 import { CommonModule } from "@angular/common";
 import { Episode, Info } from "../../models/rick-and-morty.interface";
+import { CardComponent } from "../../shared/components/cardComponent";
 
 @Component({
   selector: "app-episodes",
-  imports: [],
+  imports: [CardComponent, CommonModule],
   template: `
-    <div class="container">
-      <h2>Lista odcinków</h2>
+    <div class="container page-container">
+      <h2 class="page-title">Odcinki</h2>
+
+      <div class="cards-grid">
+        <app-card *ngFor="let episode of episodes" [data]="episode"></app-card>
+      </div>
+
       <div class="pagination-controls">
-        <button (click)="PreviousPage()" [disabled]="currentPage === 1">
-          Poprzednia
+        <button (click)="PreviousPage()" [disabled]="!paginationInfo?.prev">
+          Poprzednia Strona
         </button>
         <span>Strona {{ currentPage }}</span>
-        <button (click)="NextPage()" [disabled]="!paginationInfo?.next">Następna</button>
+        <button (click)="NextPage()" [disabled]="!paginationInfo?.next">
+          Następna Strona
+        </button>
       </div>
-      <ul>
-        @for (episode of episodes; track episode.id) {
-        <li>
-          {{ episode.name }}
-        </li>
-        }
-      </ul>
     </div>
   `,
   styles: `
@@ -38,12 +39,25 @@ import { Episode, Info } from "../../models/rick-and-morty.interface";
       cursor: pointer;
       margin-top: 16px;
     }
-    .pagination-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin-top: 20px;
+    .page-container {
+      padding: 20px;
+    }
+
+    .page-title {
+      font-family: "Creepster", cursive;
+      color: #97ce4c;
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 3px 3px 0 #06b6d4;
+    }
+
+    
+    .cards-grid {
+      display: grid;
+  
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px; 
     }
 `,
 })
