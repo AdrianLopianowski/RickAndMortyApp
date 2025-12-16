@@ -13,6 +13,11 @@ import { CardComponent } from "../shared/components/cardComponent";
   template: `
     <main class="container">
       <div class="surprise-box">
+        <div class="filters">
+          <input type="checkbox" class="characters-chk" /> Postacie
+          <input type="checkbox" class="locations-chk" /> Lokacje
+          <input type="checkbox" class="episodes-chk" /> Odcinki
+        </div>
         <h2 class="subtitle">Zaskocz Mnie!</h2>
         <p>Kliknij, aby wylosować losowy element z uniwersum.</p>
 
@@ -29,6 +34,7 @@ import { CardComponent } from "../shared/components/cardComponent";
   styles: [
     `
       .surprise-box {
+        position: relative;
         background-color: #1f2937;
         border: 1px solid #374151;
         border-radius: 8px;
@@ -78,6 +84,18 @@ import { CardComponent } from "../shared/components/cardComponent";
         color: #d1d5db;
         margin-bottom: 20px;
       }
+      .filters {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        color: #d1d5db;
+        text-align: left;
+      }
     `,
   ],
 })
@@ -91,7 +109,23 @@ export class SupriseMeComponent {
   }
 
   onClick() {
-    const category = this.GetRandomCategory();
+    const filters = this.SupriseMeFilters();
+    const categories = [];
+
+    if (filters.charactersChk) {
+      categories.push(0);
+    }
+    if (filters.locationsChk) {
+      categories.push(1);
+    }
+
+    if (filters.episodesChk) {
+      categories.push(2);
+    }
+    const category =
+      categories.length > 0
+        ? categories[Math.floor(Math.random() * categories.length)]
+        : this.GetRandomCategory();
 
     if (category === 0) {
       this.rickAndMortyService.GetRandomCharacter().subscribe((data) => {
@@ -106,5 +140,15 @@ export class SupriseMeComponent {
         this.wylosowanyObiekt = data;
       });
     }
+  }
+  SupriseMeFilters() {
+    const charactersChk = (document.querySelector(".characters-chk") as HTMLInputElement)
+      .checked;
+    const locationsChk = (document.querySelector(".locations-chk") as HTMLInputElement)
+      .checked;
+    const episodesChk = (document.querySelector(".episodes-chk") as HTMLInputElement)
+      .checked;
+
+    return { charactersChk, locationsChk, episodesChk };
   }
 }
