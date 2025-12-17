@@ -34,7 +34,7 @@ export interface Episode {
   name: string;
   air_date: string;
   episode: string;
-  characters: string[]; // Tablica linków do postaci
+  characters: string[];
   url: string;
   created: string;
 }
