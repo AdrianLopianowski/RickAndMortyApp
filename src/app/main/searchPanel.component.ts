@@ -1,35 +1,52 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { CardComponent } from "../shared/components/cardComponent";
 import { RickAndMortyService } from "../services/rick-and-morty.service";
 import { Character, Episode, Location, Info } from "../models/rick-and-morty.interface";
 import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-search-panel",
-  imports: [CardComponent, CommonModule],
+  imports: [CardComponent, CommonModule, FormsModule],
   template: `
     <main class="container">
       <div class="search-panel">
-        <input type="text" placeholder="Wpisz nazwę..." class="search-input" />
+        <input
+          type="text"
+          [(ngModel)]="searchName"
+          (input)="applyFilters()"
+          placeholder="Wpisz nazwę..."
+          class="search-input"
+        />
+
         <div class="filters">
-          <select class="filter-select">
-            <option>Status</option>
-            <option>Alive</option>
-            <option>Dead</option>
-            <option>Unknown</option>
+          <select
+            [(ngModel)]="statusFilter"
+            (change)="applyFilters()"
+            class="filter-select"
+          >
+            <option value="">Status</option>
+            <option value="Alive">Alive</option>
+            <option value="Dead">Dead</option>
+            <option value="unknown">Unknown</option>
           </select>
-          <input type="text" placeholder="Gender..." class="filter-input" />
-          <select class="filter-select">
-            <option>Gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Unknown</option>
+
+          <select
+            [(ngModel)]="genderFilter"
+            (change)="applyFilters()"
+            class="filter-select"
+          >
+            <option value="">Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="unknown">Unknown</option>
           </select>
         </div>
       </div>
     </main>
+
     <div class="cards-grid">
-      @for (character of characters; track character.id) {
+      @for (character of filteredCharacters; track character.id) {
       <app-card [data]="character"></app-card>
       }
     </div>
@@ -79,30 +96,46 @@ import { CommonModule } from "@angular/common";
     `,
   ],
 })
-export class SearchPanelComponent {
-  constructor(private rickAndMortyService: RickAndMortyService) {}
+export class SearchPanelComponent implements OnInit {
+  // Dane z API
+  allCharacters: Character[] = [];
+  // Dane wyświetlane
+  filteredCharacters: Character[] = [];
   paginationInfo: Info | null = null;
-  characters: Character[] = [];
-  currentPage: number = 1; // Initialize currentPage
+  currentPage: number = 1;
+
+  // Pola formularza
+  searchName: string = "";
+  statusFilter: string = "";
+  genderFilter: string = "";
+
+  constructor(private rickAndMortyService: RickAndMortyService) {}
+
   ngOnInit() {
     this.LoadData();
   }
+
   LoadData() {
     this.rickAndMortyService.GetAllCharacters(this.currentPage).subscribe((data) => {
       this.paginationInfo = data.info;
-      this.characters = data.results;
+      this.allCharacters = data.results;
+      this.applyFilters(); // Zastosuj filtry do nowo pobranych danych
     });
   }
-  NextPage() {
-    if (this.paginationInfo?.next) {
-      this.currentPage++;
-      this.LoadData();
-    }
-  }
-  PreviousPage() {
-    if (this.paginationInfo?.prev) {
-      this.currentPage--;
-      this.LoadData();
-    }
+
+  applyFilters() {
+    const name = this.searchName.toLowerCase();
+
+    this.filteredCharacters = this.allCharacters.filter((character) => {
+      const matchesName = character.name.toLowerCase().includes(name);
+      const matchesStatus = this.statusFilter
+        ? character.status === this.statusFilter
+        : true;
+      const matchesGender = this.genderFilter
+        ? character.gender === this.genderFilter
+        : true;
+
+      return matchesName && matchesStatus && matchesGender;
+    });
   }
 }
