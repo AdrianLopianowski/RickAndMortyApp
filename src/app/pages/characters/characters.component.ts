@@ -45,12 +45,34 @@ import { FormsModule } from "@angular/forms";
               <option value="Female">Female</option>
               <option value="unknown">Unknown</option>
             </select>
+            <select
+              [(ngModel)]="speciesFilter"
+              (change)="applyFilters()"
+              class="filter-select"
+            >
+              <option value="">Species</option>
+              <option value="Human">Human</option>
+              <option value="Alien">Alien</option>
+              <option value="Robot">Robot</option>
+              <option value="Mythological Creature">Mythological Creature</option>
+            </select>
+            <select
+              [(ngModel)]="typeFilter"
+              (change)="applyFilters()"
+              class="filter-select"
+            >
+              <option value="">Type</option>
+              <option value="Parasite">Parasite</option>
+              <option value="Cyborg">Cyborg</option>
+              <option value="Disease">Disease</option>
+              <option value="Poopybutthole">Poopybutthole</option>
+            </select>
           </div>
         </div>
       </main>
 
       <div class="cards-grid">
-        @for (character of filteredCharacters; track character.id) {
+        @for (character of Characters; track character.id) {
         <app-card [data]="character"></app-card>
         } @empty {
         <p class="text-center">Nie znaleziono postaci spełniających kryteria.</p>
@@ -80,7 +102,6 @@ import { FormsModule } from "@angular/forms";
       text-shadow: 3px 3px 0 #06b6d4;
     }
 
-    /* Styles imported from Search Panel for better UI */
     .search-panel {
       background-color: #1f2937;
       border: 1px solid #374151;
@@ -145,9 +166,10 @@ import { FormsModule } from "@angular/forms";
 export class CharactersComponent implements OnInit {
   currentPage: number = 1;
   paginationInfo: Info | null = null;
-  allCharacters: Character[] = [];
-  filteredCharacters: Character[] = [];
-
+  Characters: Character[] = [];
+  speciesFilter: string = "";
+  typeFilter: string = "";
+  originFilter: string = "";
   searchName: string = "";
   statusFilter: string = "";
   genderFilter: string = "";
@@ -159,27 +181,30 @@ export class CharactersComponent implements OnInit {
   }
 
   LoadData() {
-    this.rickAndMortyService.GetAllCharacters(this.currentPage).subscribe((data) => {
-      this.allCharacters = data.results;
-      this.paginationInfo = data.info;
-      this.applyFilters();
-    });
+    this.rickAndMortyService
+      .GetAllCharacters(
+        this.currentPage,
+        this.searchName,
+        this.statusFilter,
+        this.genderFilter,
+        this.speciesFilter,
+        this.typeFilter
+      )
+      .subscribe({
+        next: (data) => {
+          this.Characters = data.results;
+          this.paginationInfo = data.info;
+        },
+        error: (err) => {
+          this.Characters = [];
+          this.paginationInfo = null;
+        },
+      });
   }
 
   applyFilters() {
-    const name = this.searchName.toLowerCase();
-
-    this.filteredCharacters = this.allCharacters.filter((character) => {
-      const matchesName = character.name.toLowerCase().includes(name);
-      const matchesStatus = this.statusFilter
-        ? character.status === this.statusFilter
-        : true;
-      const matchesGender = this.genderFilter
-        ? character.gender === this.genderFilter
-        : true;
-
-      return matchesName && matchesStatus && matchesGender;
-    });
+    this.currentPage = 1;
+    this.LoadData();
   }
 
   NextPage() {

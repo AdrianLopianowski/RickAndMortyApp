@@ -97,14 +97,11 @@ import { FormsModule } from "@angular/forms";
   ],
 })
 export class SearchPanelComponent implements OnInit {
-  // Dane z API
   allCharacters: Character[] = [];
-  // Dane wyświetlane
   filteredCharacters: Character[] = [];
   paginationInfo: Info | null = null;
   currentPage: number = 1;
 
-  // Pola formularza
   searchName: string = "";
   statusFilter: string = "";
   genderFilter: string = "";
@@ -119,7 +116,7 @@ export class SearchPanelComponent implements OnInit {
     this.rickAndMortyService.GetAllCharacters(this.currentPage).subscribe((data) => {
       this.paginationInfo = data.info;
       this.allCharacters = data.results;
-      this.applyFilters(); // Zastosuj filtry do nowo pobranych danych
+      this.applyFilters();
     });
   }
 

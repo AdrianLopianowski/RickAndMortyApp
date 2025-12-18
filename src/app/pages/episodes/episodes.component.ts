@@ -22,21 +22,20 @@ import { FormsModule } from "@angular/forms";
             placeholder="Wpisz nazwę odcinka..."
             class="search-input"
           />
-
-          <div class="filters">
-            <input
-              type="text"
-              [(ngModel)]="codeFilter"
-              (input)="applyFilters()"
-              placeholder="Kod (np. S01)..."
-              class="filter-input"
-            />
-          </div>
+          <select [(ngModel)]="codeFilter" (change)="applyFilters()" class="filter-input">
+            <option value="">Wybierz Sezon</option>
+            <option
+              *ngFor="let code of ['S01', 'S02', 'S03', 'S04', 'S05']"
+              [value]="code"
+            >
+              {{ code }}
+            </option>
+          </select>
         </div>
       </main>
 
       <div class="cards-grid">
-        @for (episode of filteredEpisodes; track episode.id) {
+        @for (episode of episodes; track episode.id) {
         <app-card [data]="episode"></app-card>
         }
       </div>
@@ -66,7 +65,6 @@ import { FormsModule } from "@angular/forms";
       text-shadow: 3px 3px 0 #06b6d4;
     }
 
-    /* Filtering styles from SearchPanelComponent */
     .search-panel {
       background-color: #1f2937;
       border: 1px solid #374151;
@@ -98,7 +96,6 @@ import { FormsModule } from "@angular/forms";
       min-width: 180px;
     }
 
-    /* Restored original cards-grid styling */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -135,8 +132,7 @@ export class EpisodesComponent implements OnInit {
 
   currentPage: number = 1;
   paginationInfo: Info | null = null;
-  allEpisodes: Episode[] = [];
-  filteredEpisodes: Episode[] = [];
+  episodes: Episode[] = [];
 
   searchName: string = "";
   codeFilter: string = "";
@@ -146,23 +142,23 @@ export class EpisodesComponent implements OnInit {
   }
 
   LoadData() {
-    this.rickAndMortyService.GetAllEpisodes(this.currentPage).subscribe((data) => {
-      this.allEpisodes = data.results;
-      this.paginationInfo = data.info;
-      this.applyFilters();
-    });
+    this.rickAndMortyService
+      .GetAllEpisodes(this.currentPage, this.searchName, this.codeFilter)
+      .subscribe({
+        next: (data) => {
+          this.episodes = data.results;
+          this.paginationInfo = data.info;
+        },
+        error: () => {
+          this.episodes = [];
+          this.paginationInfo = null;
+        },
+      });
   }
 
   applyFilters() {
-    const name = this.searchName.toLowerCase();
-    const code = this.codeFilter.toLowerCase();
-
-    this.filteredEpisodes = this.allEpisodes.filter((episode) => {
-      const matchesName = episode.name.toLowerCase().includes(name);
-      const matchesCode = episode.episode.toLowerCase().includes(code);
-
-      return matchesName && matchesCode;
-    });
+    this.currentPage = 1;
+    this.LoadData();
   }
 
   NextPage() {

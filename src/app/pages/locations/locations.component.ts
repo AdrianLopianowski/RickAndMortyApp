@@ -23,26 +23,43 @@ import { FormsModule } from "@angular/forms";
             class="search-input"
           />
           <div class="filters">
-            <input
-              type="text"
+            <select
               [(ngModel)]="typeFilter"
-              (input)="applyFilters()"
-              placeholder="Typ (np. Planet)..."
+              (change)="applyFilters()"
               class="filter-input"
-            />
-            <input
-              type="text"
+            >
+              <option value="">Typ</option>
+              <option value="Planet">Planet</option>
+              <option value="Cluster">Cluster</option>
+              <option value="Space station">Space station</option>
+              <option value="Microverse">Microverse</option>
+              <option value="TV">TV</option>
+              <option value="Resort">Resort</option>
+              <option value="Fantasy town">Fantasy town</option>
+              <option value="Dream">Dream</option>
+              <option value="Dimension">Dimension</option>
+            </select>
+            <select
               [(ngModel)]="dimensionFilter"
-              (input)="applyFilters()"
-              placeholder="Wymiar..."
+              (change)="applyFilters()"
               class="filter-input"
-            />
+            >
+              <option value="">Wymiar</option>
+              <option value="Dimension C-137">Dimension C-137</option>
+              <option value="Post-Apocalyptic Dimension">
+                Post-Apocalyptic Dimension
+              </option>
+              <option value="Replacement Dimension">Replacement Dimension</option>
+              <option value="Cronenberg Dimension">Cronenberg Dimension</option>
+              <option value="Fantasy Dimension">Fantasy Dimension</option>
+              <option value="Unknown dimension">Unknown dimension</option>
+            </select>
           </div>
         </div>
       </main>
 
       <div class="cards-grid">
-        @for (location of filteredLocations; track location.id) {
+        @for (location of locations; track location.id) {
         <app-card [data]="location"></app-card>
         }
       </div>
@@ -125,8 +142,8 @@ import { FormsModule } from "@angular/forms";
   ],
 })
 export class LocationsComponent implements OnInit {
-  allLocations: Location[] = [];
-  filteredLocations: Location[] = [];
+  locations: Location[] = [];
+
   paginationInfo: Info | null = null;
   currentPage: number = 1;
 
@@ -141,21 +158,28 @@ export class LocationsComponent implements OnInit {
   }
 
   LoadData() {
-    this.rickAndMortyService.GetAllLocations(this.currentPage).subscribe((data) => {
-      this.allLocations = data.results;
-      this.paginationInfo = data.info;
-      this.applyFilters();
-    });
+    this.rickAndMortyService
+      .GetAllLocations(
+        this.currentPage,
+        this.searchName,
+        this.typeFilter,
+        this.dimensionFilter
+      )
+      .subscribe({
+        next: (data) => {
+          this.locations = data.results;
+          this.paginationInfo = data.info;
+        },
+        error: () => {
+          this.locations = [];
+          this.paginationInfo = null;
+        },
+      });
   }
 
   applyFilters() {
-    this.filteredLocations = this.allLocations.filter((loc) => {
-      return (
-        loc.name.toLowerCase().includes(this.searchName.toLowerCase()) &&
-        loc.type.toLowerCase().includes(this.typeFilter.toLowerCase()) &&
-        loc.dimension.toLowerCase().includes(this.dimensionFilter.toLowerCase())
-      );
-    });
+    this.currentPage = 1;
+    this.LoadData();
   }
 
   NextPage() {
