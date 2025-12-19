@@ -6,7 +6,6 @@ import { SearchPanelComponent } from "../../main/searchPanel.component";
 
 @Component({
   selector: "app-home",
-  standalone: true,
   imports: [CommonModule, SupriseMeComponent, SearchPanelComponent],
   template: `
     <main class="container">

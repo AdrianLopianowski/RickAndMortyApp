@@ -4,6 +4,7 @@ import { EpisodesComponent } from "./pages/episodes/episodes.component";
 import { LocationsComponent } from "./pages/locations/locations.component";
 import { HomeComponent } from "./pages/home/home.component";
 import { LoginComponent } from "./pages/login/login.component";
+import { FavoritesComponent } from "./pages/favorites/favorites.component";
 
 import { loginGuard } from "./guards/login.guard";
 
@@ -13,6 +14,7 @@ export const routes: Routes = [
   { path: "episodes", component: EpisodesComponent },
   { path: "locations", component: LocationsComponent },
   { path: "login", component: LoginComponent, canActivate: [loginGuard] },
+  { path: "favorites", component: FavoritesComponent },
 
   { path: "**", redirectTo: "" },
 ];

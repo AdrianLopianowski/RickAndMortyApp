@@ -7,7 +7,6 @@ import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-episodes",
-  standalone: true,
   imports: [CardComponent, CommonModule, FormsModule],
   template: `
     <div class="container page-container">

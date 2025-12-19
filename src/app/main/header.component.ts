@@ -20,6 +20,10 @@ import { AuthService } from "../services/auth.service";
           >
           <a routerLink="/episodes" routerLinkActive="active" class="nav-link">Odcinki</a>
 
+          <a routerLink="/favorites" routerLinkActive="active" class="nav-link"
+            >Ulubione</a
+          >
+
           @if (authService.isLoggenIn$ | async) {
           <button (click)="onLogout()" class="nav-link logout-btn">Wyloguj</button>
           } @else {

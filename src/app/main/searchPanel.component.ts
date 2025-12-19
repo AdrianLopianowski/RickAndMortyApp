@@ -53,6 +53,7 @@ import { FormsModule } from "@angular/forms";
         Następna Strona
       </button>
     </div>
+    <br />
     <div class="cards-grid">
       @for (character of characters; track character.id) {
       <app-card [data]="character"></app-card>

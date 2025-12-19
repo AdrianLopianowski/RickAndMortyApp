@@ -7,7 +7,6 @@ import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: "app-characters",
-  standalone: true,
   imports: [CommonModule, CardComponent, FormsModule],
   template: `
     <div class="container page-container">
