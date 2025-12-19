@@ -44,9 +44,17 @@ import { FormsModule } from "@angular/forms";
         </div>
       </div>
     </main>
-
+    <div class="pagination-controls">
+      <button (click)="PreviousPage()" [disabled]="!paginationInfo?.prev">
+        Poprzednia Strona
+      </button>
+      <span>Strona {{ currentPage }}</span>
+      <button (click)="NextPage()" [disabled]="!paginationInfo?.next">
+        Następna Strona
+      </button>
+    </div>
     <div class="cards-grid">
-      @for (character of filteredCharacters; track character.id) {
+      @for (character of characters; track character.id) {
       <app-card [data]="character"></app-card>
       }
     </div>
@@ -64,7 +72,28 @@ import { FormsModule } from "@angular/forms";
         color: #f9fafb;
         font-size: 16px;
       }
+      .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        margin-top: 30px;
+      }
 
+      button {
+        background-color: #06b6d4;
+        color: white;
+        font-weight: 700;
+        padding: 8px 24px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
       .search-input {
         margin-bottom: 16px;
       }
@@ -97,11 +126,12 @@ import { FormsModule } from "@angular/forms";
   ],
 })
 export class SearchPanelComponent implements OnInit {
-  allCharacters: Character[] = [];
-  filteredCharacters: Character[] = [];
+  characters: Character[] = [];
   paginationInfo: Info | null = null;
   currentPage: number = 1;
 
+  speciesFilter: string = "";
+  typeFilter: string = "";
   searchName: string = "";
   statusFilter: string = "";
   genderFilter: string = "";
@@ -113,26 +143,43 @@ export class SearchPanelComponent implements OnInit {
   }
 
   LoadData() {
-    this.rickAndMortyService.GetAllCharacters(this.currentPage).subscribe((data) => {
-      this.paginationInfo = data.info;
-      this.allCharacters = data.results;
-      this.applyFilters();
-    });
+    this.rickAndMortyService
+      .GetAllCharacters(
+        this.currentPage,
+        this.searchName,
+        this.statusFilter,
+        this.genderFilter,
+        this.speciesFilter,
+        this.typeFilter
+      )
+      .subscribe({
+        next: (data) => {
+          this.characters = data.results;
+          this.paginationInfo = data.info;
+        },
+        error: (err) => {
+          this.characters = [];
+          this.paginationInfo = null;
+        },
+      });
   }
 
   applyFilters() {
-    const name = this.searchName.toLowerCase();
+    this.currentPage = 1;
+    this.LoadData();
+  }
 
-    this.filteredCharacters = this.allCharacters.filter((character) => {
-      const matchesName = character.name.toLowerCase().includes(name);
-      const matchesStatus = this.statusFilter
-        ? character.status === this.statusFilter
-        : true;
-      const matchesGender = this.genderFilter
-        ? character.gender === this.genderFilter
-        : true;
+  NextPage() {
+    if (this.paginationInfo?.next) {
+      this.currentPage++;
+      this.LoadData();
+    }
+  }
 
-      return matchesName && matchesStatus && matchesGender;
-    });
+  PreviousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.LoadData();
+    }
   }
 }
