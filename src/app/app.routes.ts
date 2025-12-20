@@ -7,6 +7,7 @@ import { LoginComponent } from "./pages/login/login.component";
 import { FavoritesComponent } from "./pages/favorites/favorites.component";
 
 import { loginGuard } from "./guards/login.guard";
+import { authGuard } from "./guards/auth.guard";
 
 export const routes: Routes = [
   { path: "", component: HomeComponent },
@@ -14,7 +15,7 @@ export const routes: Routes = [
   { path: "episodes", component: EpisodesComponent },
   { path: "locations", component: LocationsComponent },
   { path: "login", component: LoginComponent, canActivate: [loginGuard] },
-  { path: "favorites", component: FavoritesComponent },
+  { path: "favorites", component: FavoritesComponent, canActivate: [authGuard] },
 
   { path: "**", redirectTo: "" },
 ];

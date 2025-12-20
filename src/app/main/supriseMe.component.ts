@@ -8,7 +8,6 @@ import { CardComponent } from "../shared/components/cardComponent";
 
 @Component({
   selector: "app-suprise-me",
-  standalone: true,
   imports: [CommonModule, CardComponent],
   template: `
     <main class="container">
