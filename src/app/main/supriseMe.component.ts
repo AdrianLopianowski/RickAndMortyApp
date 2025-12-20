@@ -1,14 +1,20 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
 
 import { RickAndMortyService } from "../services/rick-and-morty.service";
-import { Character, Episode, Location } from "../models/rick-and-morty.interface";
+import {
+  Character,
+  Episode,
+  Location,
+  RickAndMortyData,
+} from "../models/rick-and-morty.interface";
 
 import { CardComponent } from "../shared/components/cardComponent";
 
 @Component({
   selector: "app-suprise-me",
-  imports: [CommonModule, CardComponent],
+  imports: [CommonModule, CardComponent, FormsModule],
   template: `
     <main class="container">
       <div class="surprise-box">
@@ -99,7 +105,13 @@ import { CardComponent } from "../shared/components/cardComponent";
   ],
 })
 export class SupriseMeComponent {
-  wylosowanyObiekt: any = null;
+  wylosowanyObiekt: RickAndMortyData | null = null;
+
+  filters = {
+    characters: false,
+    locations: false,
+    episodes: false,
+  };
 
   constructor(private rickAndMortyService: RickAndMortyService) {}
 

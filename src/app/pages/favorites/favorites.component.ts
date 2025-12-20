@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 import { CardComponent } from "../../shared/components/cardComponent";
 import { FavoritesService } from "../../services/favorites.service";
 import { RouterLink } from "@angular/router";
-
+import { RickAndMortyData } from "../../models/rick-and-morty.interface";
 @Component({
   selector: "app-favorites",
   imports: [CommonModule, CardComponent, RouterLink],
@@ -74,7 +74,7 @@ import { RouterLink } from "@angular/router";
   ],
 })
 export class FavoritesComponent implements OnInit {
-  favorites: any[] = [];
+  favorites: RickAndMortyData[] = [];
 
   constructor(private favoritesService: FavoritesService) {}
 

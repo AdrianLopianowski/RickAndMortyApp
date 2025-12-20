@@ -43,3 +43,5 @@ export interface ApiResponse<T> {
   info: Info;
   results: T[];
 }
+
+export type RickAndMortyData = Character | Location | Episode;
