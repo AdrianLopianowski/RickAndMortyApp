@@ -2,13 +2,18 @@ import { Component, Input, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
 import { AuthService } from "../../services/auth.service";
-import { FavoritesComponent } from "../../pages/favorites/favorites.component";
 import { FavoritesService } from "../../services/favorites.service";
+import {
+  RickAndMortyData,
+  Character,
+  Location,
+  Episode,
+} from "../../models/rick-and-morty.interface";
 
 @Component({
   selector: "app-card",
+  standalone: true,
   imports: [CommonModule],
-
   template: `
     <article class="card-main">
       <button
@@ -29,36 +34,43 @@ import { FavoritesService } from "../../services/favorites.service";
         </svg>
       </button>
 
-      @if (data.image) {
+      @if (character?.image) {
       <div class="image-wrapper">
-        <img [src]="data.image" [alt]="data.name" />
+        <img [src]="character!.image" [alt]="data.name" />
       </div>
       }
 
       <div class="card-content">
         <h2 class="card-title">{{ data.name }}</h2>
 
-        @if (data.status) {
+        @if (character) {
         <p class="info-row">
           <span class="label">Status:</span>
           <span
             class="value"
-            [class.dead]="data.status === 'Dead'"
-            [class.alive]="data.status === 'Alive'"
+            [class.dead]="character.status === 'Dead'"
+            [class.alive]="character.status === 'Alive'"
           >
-            {{ data.status }}
+            {{ character.status }}
           </span>
         </p>
-        } @if (data.species) {
-        <p class="info-row"><span class="label">Gatunek:</span> {{ data.species }}</p>
-        } @if (data.type) {
-        <p class="info-row"><span class="label">Typ:</span> {{ data.type }}</p>
-        } @if (data.air_date) {
         <p class="info-row">
-          <span class="label">Data emisji:</span> {{ data.air_date }}
+          <span class="label">Gatunek:</span> {{ character.species }}
         </p>
-        } @if (data.dimension) {
-        <p class="info-row"><span class="label">Wymiar:</span> {{ data.dimension }}</p>
+        <p class="info-row"><span class="label">Płeć:</span> {{ character.gender }}</p>
+        } @if (safeType) {
+        <p class="info-row"><span class="label">Typ:</span> {{ safeType }}</p>
+        } @if (episode) {
+        <p class="info-row">
+          <span class="label">Data emisji:</span> {{ episode.air_date }}
+        </p>
+        <p class="info-row">
+          <span class="label">Kod odcinka:</span> {{ episode.episode }}
+        </p>
+        } @if (location) {
+        <p class="info-row">
+          <span class="label">Wymiar:</span> {{ location.dimension }}
+        </p>
         }
       </div>
     </article>
@@ -76,7 +88,6 @@ import { FavoritesService } from "../../services/favorites.service";
         flex-direction: column;
         position: relative;
       }
-
       .favorite-btn {
         position: absolute;
         top: 10px;
@@ -93,23 +104,19 @@ import { FavoritesService } from "../../services/favorites.service";
         z-index: 10;
         transition: transform 0.2s, background-color 0.2s;
       }
-
       .heart-icon {
         width: 24px;
         height: 24px;
         color: #9ca3af;
         transition: color 0.3s;
       }
-
       .favorite-btn:hover {
         transform: scale(1.1);
         background: rgba(0, 0, 0, 0.8);
       }
-
       .favorite-btn.active .heart-icon {
         color: #ef4444;
       }
-
       .card-main:hover {
         transform: translateY(-5px);
         border-color: #97ce4c;
@@ -119,6 +126,7 @@ import { FavoritesService } from "../../services/favorites.service";
         width: 100%;
         height: 250px;
         overflow: hidden;
+        background-color: #111827;
       }
       img {
         width: 100%;
@@ -161,7 +169,7 @@ import { FavoritesService } from "../../services/favorites.service";
   ],
 })
 export class CardComponent implements OnInit {
-  @Input() data: any;
+  @Input() data!: RickAndMortyData;
   isFavorite: boolean = false;
 
   constructor(
@@ -171,20 +179,48 @@ export class CardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.checkIfFavorite();
+  }
+
+  checkIfFavorite() {
     if (this.authService.isAuthenticated()) {
       this.isFavorite = this.favoritesService.isFavorite(this.data);
+    } else {
+      this.isFavorite = false;
     }
   }
 
   toggleFavorite(event: Event) {
     event.stopPropagation();
-
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(["/login"]);
       return;
     }
-
     this.favoritesService.toggleFavorite(this.data);
     this.isFavorite = !this.isFavorite;
+  }
+
+  get character(): Character | null {
+    return "species" in this.data ? this.data : null;
+  }
+
+  get location(): Location | null {
+    return "dimension" in this.data ? this.data : null;
+  }
+
+  get episode(): Episode | null {
+    if ("episode" in this.data) {
+      if (typeof this.data.episode === "string") {
+        return this.data as Episode;
+      }
+    }
+    return null;
+  }
+
+  get safeType(): string | undefined {
+    if ("type" in this.data) {
+      return this.data.type;
+    }
+    return undefined;
   }
 }
