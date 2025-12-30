@@ -4,10 +4,10 @@ import { CommonModule } from "@angular/common";
 import { Location, Info } from "../../models/rick-and-morty.interface";
 import { CardComponent } from "../../shared/components/cardComponent";
 import { FormsModule } from "@angular/forms";
+import { FavoritesService } from "../../services/favorites.service";
 
 @Component({
   selector: "app-locations",
-  standalone: true,
   imports: [CommonModule, CardComponent, FormsModule],
   template: `
     <div class="container page-container">
@@ -39,6 +39,7 @@ import { FormsModule } from "@angular/forms";
               <option value="Dream">Dream</option>
               <option value="Dimension">Dimension</option>
             </select>
+
             <select
               [(ngModel)]="dimensionFilter"
               (change)="applyFilters()"
@@ -55,6 +56,15 @@ import { FormsModule } from "@angular/forms";
               <option value="Unknown dimension">Unknown dimension</option>
             </select>
           </div>
+          <br />
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input
+              type="checkbox"
+              [(ngModel)]="favoritesOnly"
+              (change)="applyFilters()"
+            />
+            <span>Tylko ulubione</span>
+          </label>
         </div>
       </main>
 
@@ -151,30 +161,62 @@ export class LocationsComponent implements OnInit {
   typeFilter: string = "";
   dimensionFilter: string = "";
 
-  constructor(private rickAndMortyService: RickAndMortyService) {}
+  favoritesOnly: boolean = false;
+
+  constructor(
+    private rickAndMortyService: RickAndMortyService,
+    private favoritesService: FavoritesService
+  ) {}
 
   ngOnInit() {
     this.LoadData();
   }
 
   LoadData() {
-    this.rickAndMortyService
-      .GetAllLocations(
-        this.currentPage,
-        this.searchName,
-        this.typeFilter,
-        this.dimensionFilter
-      )
-      .subscribe({
-        next: (data) => {
-          this.locations = data.results;
-          this.paginationInfo = data.info;
-        },
-        error: () => {
-          this.locations = [];
-          this.paginationInfo = null;
-        },
-      });
+    if (this.favoritesOnly) {
+      const allFavorites = this.favoritesService.getFavorites();
+
+      let filteredLocations = allFavorites.filter(
+        (item) => "dimension" in item
+      ) as Location[];
+
+      if (this.searchName) {
+        filteredLocations = filteredLocations.filter((loc) =>
+          loc.name.toLowerCase().includes(this.searchName.toLowerCase())
+        );
+      }
+      if (this.typeFilter) {
+        filteredLocations = filteredLocations.filter(
+          (loc) => loc.type === this.typeFilter
+        );
+      }
+      if (this.dimensionFilter) {
+        filteredLocations = filteredLocations.filter(
+          (loc) => loc.dimension === this.dimensionFilter
+        );
+      }
+
+      this.locations = filteredLocations;
+      this.paginationInfo = null;
+    } else {
+      this.rickAndMortyService
+        .GetAllLocations(
+          this.currentPage,
+          this.searchName,
+          this.typeFilter,
+          this.dimensionFilter
+        )
+        .subscribe({
+          next: (data) => {
+            this.locations = data.results;
+            this.paginationInfo = data.info;
+          },
+          error: () => {
+            this.locations = [];
+            this.paginationInfo = null;
+          },
+        });
+    }
   }
 
   applyFilters() {

@@ -7,7 +7,6 @@ import { User } from "../../models/user.interface";
 
 @Component({
   selector: "app-login",
-  standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="container login-container">
