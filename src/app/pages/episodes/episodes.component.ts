@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { Episode, Info } from "../../models/rick-and-morty.interface";
 import { CardComponent } from "../../shared/components/cardComponent";
 import { FormsModule } from "@angular/forms";
+import { FavoritesService } from "../../services/favorites.service";
 
 @Component({
   selector: "app-episodes",
@@ -30,6 +31,15 @@ import { FormsModule } from "@angular/forms";
               {{ code }}
             </option>
           </select>
+
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input
+              type="checkbox"
+              [(ngModel)]="favoritesOnly"
+              (change)="applyFilters()"
+            />
+            <span>Tylko ulubione</span>
+          </label>
         </div>
       </main>
 
@@ -124,10 +134,15 @@ import { FormsModule } from "@angular/forms";
       opacity: 0.5;
       cursor: not-allowed;
     }
+    input[type="checkbox"] { margin-top: 15px;
+    }
   `,
 })
 export class EpisodesComponent implements OnInit {
-  constructor(private rickAndMortyService: RickAndMortyService) {}
+  constructor(
+    private rickAndMortyService: RickAndMortyService,
+    private favoritesService: FavoritesService
+  ) {}
 
   currentPage: number = 1;
   paginationInfo: Info | null = null;
@@ -136,25 +151,48 @@ export class EpisodesComponent implements OnInit {
   searchName: string = "";
   codeFilter: string = "";
 
+  favoritesOnly: boolean = false;
+
   ngOnInit() {
     this.LoadData();
   }
 
   LoadData() {
-    this.rickAndMortyService
-      .GetAllEpisodes(this.currentPage, this.searchName, this.codeFilter)
-      .subscribe({
-        next: (data) => {
-          this.episodes = data.results;
-          this.paginationInfo = data.info;
-        },
-        error: () => {
-          this.episodes = [];
-          this.paginationInfo = null;
-        },
-      });
-  }
+    if (this.favoritesOnly) {
+      const allFavorites = this.favoritesService.getFavorites();
 
+      let filteredEpisodes = allFavorites.filter(
+        (item) => "air_date" in item
+      ) as Episode[];
+
+      if (this.searchName) {
+        filteredEpisodes = filteredEpisodes.filter((ep) =>
+          ep.name.toLowerCase().includes(this.searchName.toLowerCase())
+        );
+      }
+      if (this.codeFilter) {
+        filteredEpisodes = filteredEpisodes.filter(
+          (ep) => ep.episode === this.codeFilter
+        );
+      }
+
+      this.episodes = filteredEpisodes;
+      this.paginationInfo = null;
+    } else {
+      this.rickAndMortyService
+        .GetAllEpisodes(this.currentPage, this.searchName, this.codeFilter)
+        .subscribe({
+          next: (data) => {
+            this.episodes = data.results;
+            this.paginationInfo = data.info;
+          },
+          error: () => {
+            this.episodes = [];
+            this.paginationInfo = null;
+          },
+        });
+    }
+  }
   applyFilters() {
     this.currentPage = 1;
     this.LoadData();
