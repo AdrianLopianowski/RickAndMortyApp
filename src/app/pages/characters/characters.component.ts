@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { Character, Info } from "../../models/rick-and-morty.interface";
 import { CardComponent } from "../../shared/components/cardComponent";
 import { FormsModule } from "@angular/forms";
+import { FavoritesService } from "../../services/favorites.service";
 
 @Component({
   selector: "app-characters",
@@ -67,6 +68,14 @@ import { FormsModule } from "@angular/forms";
               <option value="Poopybutthole">Poopybutthole</option>
             </select>
           </div>
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input
+              type="checkbox"
+              [(ngModel)]="favoritesOnly"
+              (change)="applyFilters()"
+            />
+            <span>Tylko ulubione</span>
+          </label>
         </div>
       </main>
 
@@ -121,6 +130,8 @@ import { FormsModule } from "@angular/forms";
 
     .search-input { margin-bottom: 16px; }
 
+    input[type="checkbox"] { margin-top: 15px;
+    }
     .filters {
       display: flex;
       flex-wrap: wrap;
@@ -173,34 +184,60 @@ export class CharactersComponent implements OnInit {
   statusFilter: string = "";
   genderFilter: string = "";
 
-  constructor(private rickAndMortyService: RickAndMortyService) {}
+  favoritesOnly: boolean = false;
+
+  constructor(
+    private rickAndMortyService: RickAndMortyService,
+    private favoritesService: FavoritesService
+  ) {}
 
   ngOnInit() {
     this.LoadData();
   }
 
   LoadData() {
-    this.rickAndMortyService
-      .GetAllCharacters(
-        this.currentPage,
-        this.searchName,
-        this.statusFilter,
-        this.genderFilter,
-        this.speciesFilter,
-        this.typeFilter
-      )
-      .subscribe({
-        next: (data) => {
-          this.Characters = data.results;
-          this.paginationInfo = data.info;
-        },
-        error: (err) => {
-          this.Characters = [];
-          this.paginationInfo = null;
-        },
-      });
-  }
+    if (this.favoritesOnly) {
+      const allFavorites = this.favoritesService.getFavorites();
 
+      let filteredCharacters = allFavorites.filter(
+        (item) => "species" in item
+      ) as Character[];
+
+      if (this.searchName) {
+        filteredCharacters = filteredCharacters.filter((character) =>
+          character.name.toLowerCase().includes(this.searchName.toLowerCase())
+        );
+      }
+      if (this.originFilter) {
+        filteredCharacters = filteredCharacters.filter(
+          (character) => character.name === this.originFilter
+        );
+      }
+
+      this.Characters = filteredCharacters;
+      this.paginationInfo = null;
+    } else {
+      this.rickAndMortyService
+        .GetAllCharacters(
+          this.currentPage,
+          this.searchName,
+          this.statusFilter,
+          this.genderFilter,
+          this.speciesFilter,
+          this.typeFilter
+        )
+        .subscribe({
+          next: (data) => {
+            this.Characters = data.results;
+            this.paginationInfo = data.info;
+          },
+          error: () => {
+            this.Characters = [];
+            this.paginationInfo = null;
+          },
+        });
+    }
+  }
   applyFilters() {
     this.currentPage = 1;
     this.LoadData();
