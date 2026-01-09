@@ -41,6 +41,7 @@ export class RickAndMortyService {
     if (status) params = params.set("status", status);
     if (species) params = params.set("species", species);
     if (type) params = params.set("type", type);
+    if (gender) params = params.set("gender", gender);
     return this.http.get<ApiResponse<Character>>(
       `https://rickandmortyapi.com/api/character`,
       { params }
